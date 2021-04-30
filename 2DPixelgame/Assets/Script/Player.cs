@@ -23,6 +23,14 @@ public class Player : MonoBehaviour
     public AudioSource aud;
     [Header("攻擊音效")]
     public AudioClip soundAttack;
+    [Header("血量")]
+    public float hp = 200;
+    [Header("血條系統")]
+    public HpManager hpManager;
+
+
+
+    private float hpMax;
 
     //事件:繪製圖示
     private void OnDrawGizmos()
@@ -66,9 +74,17 @@ public class Player : MonoBehaviour
 
     }
 
-    private void Hit()
+
+
+    /// <summary>
+    /// 受傷
+    /// </summary>
+    /// <param name="damage">接受到的傷害直</param>
+    public void Hit(float damage)
     {
-        
+        hp -= damage;                            //扣除傷害直
+        hpManager.UpdateHpBar(hp, hpMax);        //更新血條
+        StartCoroutine(hpManager.ShowDamage());  //啟動協同程序(顯示傷害數值)
     }
 
     private void Dead()
@@ -78,7 +94,8 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
-        Move();
+        hpMax = hp;             //取得血量最大值
+        
     }
     private void Update()
     {

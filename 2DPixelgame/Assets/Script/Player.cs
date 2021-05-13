@@ -1,14 +1,14 @@
 ﻿
 using UnityEngine;
 using UnityEngine.UI; // 引用 介面 API
+using UnityEngine.SceneManagement;  //引用 場景管理 API
+
 public class Player : MonoBehaviour
 {
     [Header("等級")]
     public int lv = 1;
     [Header("移動速度"),Range(0,300)]
     public float speed = 0.5f;
-    [Header("角色是否死亡")]
-    public bool isDead = false;
     [Header("角色名稱"),Tooltip("這是角色的名稱")]
     public string cName = "貓咪";
     [Header("虛擬搖桿")]
@@ -27,9 +27,13 @@ public class Player : MonoBehaviour
     public float hp = 200;
     [Header("血條系統")]
     public HpManager hpManager;
+    [Header("攻擊力"), Range(0, 1000)]
+    public float attack = 20;
+    [Header("等級文字")]
+    public Text textLV;
 
 
-
+    private bool isDead = false;
     private float hpMax;
 
     //事件:繪製圖示
@@ -46,6 +50,7 @@ public class Player : MonoBehaviour
     /// </summary>
     private void Move()
     {
+        if (isDead) return;                     //如果 死亡 就跳出
 
         float h = joystick.Horizontal;
         float v = joystick.Vertical;
@@ -61,6 +66,8 @@ public class Player : MonoBehaviour
     //要被按鈕呼叫必須設定為公開 public
     public void Attack()
     {
+        if (isDead) return;                     //如果 死亡 就跳出
+
         //音效來源,播放一次(音效片段，音量)
         aud.PlayOneShot(soundAttack, 0.5f);
 
@@ -69,6 +76,8 @@ public class Player : MonoBehaviour
 
         //如果 碰到物件存在 並且 碰到的物件 標籤 為 道具 就 取得道具腳本並呼叫掉落道具方法
         if (hit && hit.collider.tag == "道具") hit.collider.GetComponent<Item>().DropProp();
+        //如果 打到的標籤是 敵人 就對他造成傷害
+        if (hit && hit.collider.tag == "敵人") hit.collider.GetComponent<Enemy>().Hit(attack);
 
 
 
@@ -84,19 +93,39 @@ public class Player : MonoBehaviour
     {
         hp -= damage;                            //扣除傷害直
         hpManager.UpdateHpBar(hp, hpMax);        //更新血條
-        StartCoroutine(hpManager.ShowDamage());  //啟動協同程序(顯示傷害數值)
+        StartCoroutine(hpManager.ShowDamage(damage));  //啟動協同程序(顯示傷害數值)
+
+        if (hp <= 0) Dead();                           //如果 血量 <= 0 就死亡
     }
 
+    /// <summary>
+    /// 死亡
+    /// </summary>
     private void Dead()
     {
-
+        hp = 0;
+        isDead = true;
+        Invoke("Replay", 2);               //延遲呼叫("方法名稱"，延遲時間)
     }
 
+    /// <summary>
+    /// 重新遊戲
+    /// </summary>
+    private void Replay()
+    {
+        SceneManager.LoadScene("遊戲場景");
+    }
+
+
+    //事件 - 特定時間會執行的方法
+    //開始事件 : 播放後執行一次
     private void Start()
     {
         hpMax = hp;             //取得血量最大值
         
     }
+
+    //更新事件 : 大約一秒執行60次 60FPS
     private void Update()
     {
         Move();

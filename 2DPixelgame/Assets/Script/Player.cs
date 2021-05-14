@@ -31,10 +31,20 @@ public class Player : MonoBehaviour
     public float attack = 20;
     [Header("等級文字")]
     public Text textLV;
+    [Header("經驗值吧條")]
+    public Image imgExp;
 
+
+
+    /// <summary>
+    /// 需要多少經驗值才會升等，一等設定為100
+    /// </summary>
+    private float expNeed = 100;
 
     private bool isDead = false;
     private float hpMax;
+    private float exp;
+
 
     //事件:繪製圖示
     private void OnDrawGizmos()
@@ -79,10 +89,29 @@ public class Player : MonoBehaviour
         //如果 打到的標籤是 敵人 就對他造成傷害
         if (hit && hit.collider.tag == "敵人") hit.collider.GetComponent<Enemy>().Hit(attack);
 
-
-
     }
 
+    /// <summary>
+    /// 經驗值控制
+    /// </summary>
+    /// <param name="getExp">接收到的經驗值</param>
+    public void Exp(float getExp)
+    {
+        //取得目前等級經驗需求
+        expNeed = expData.exp[lv - 1];
+        exp += getExp;
+        print("經驗值:" + exp);
+        imgExp.fillAmount = exp / expNeed;
+
+        //升級
+        if(exp >= expNeed)                          //如果 經驗值>=經驗需求 ex 120>100
+        {
+            lv++;                                   //升級 ex 2 
+            textLV.text = "LV" + lv;                //介面更新 ex LV2
+            exp -= expNeed;                         //將多餘的經驗值補回來 ex 120-100=20
+            imgExp.fillAmount = exp / expNeed;      //介面更新
+        }
+    }
 
 
     /// <summary>
@@ -116,13 +145,24 @@ public class Player : MonoBehaviour
         SceneManager.LoadScene("遊戲場景");
     }
 
+    [Header("經驗值資料")]
+    public ExpData expData;
+
+
 
     //事件 - 特定時間會執行的方法
     //開始事件 : 播放後執行一次
     private void Start()
     {
         hpMax = hp;             //取得血量最大值
-        
+
+        //利用公式寫入經驗值資料，一等100，兩等200...
+        for (int i = 0; i < 99; i++)
+        {
+            //經驗值資料 的 經驗值陣列[編號] = 攻式
+            //公式 : (編號+1)*100 每等增加100
+            expData.exp[i] = (i + 1) * 100;
+        }
     }
 
     //更新事件 : 大約一秒執行60次 60FPS

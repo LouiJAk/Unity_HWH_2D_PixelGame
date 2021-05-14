@@ -123,9 +123,11 @@ public class Enemy : MonoBehaviour
     /// </summary>
     private void Dead()
     {
+        if (isDead) return;
         hp = 0;
         isDead = true;
         Destroy(gameObject, 1.5f);
+        _player.Exp(exp);
     }
 
 

@@ -4938,6 +4938,7 @@ MonoBehaviour:
   attack: 20
   hp: 200
   hpManager: {fileID: 7834979228700324498}
+  exp: 30
 --- !u!70 &7688630984587460094
 CapsuleCollider2D:
   m_ObjectHideFlags: 0

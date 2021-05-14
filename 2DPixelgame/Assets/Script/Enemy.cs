@@ -18,7 +18,7 @@ public class Enemy : MonoBehaviour
     public float hp = 200;
     [Header("血條系統")]
     public HpManager hpManager;
-    [Header("經驗值"), Range(0, 500)]
+    [Header("經驗值"), Range(0, 50000)]
     public float exp = 50;
 
 

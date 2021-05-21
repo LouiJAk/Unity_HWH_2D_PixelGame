@@ -45,6 +45,7 @@ public class Player : MonoBehaviour
     private float hpMax;
     private float exp;
 
+    public float attackWeapon;
 
     //事件:繪製圖示
     private void OnDrawGizmos()
@@ -87,8 +88,9 @@ public class Player : MonoBehaviour
         //如果 碰到物件存在 並且 碰到的物件 標籤 為 道具 就 取得道具腳本並呼叫掉落道具方法
         if (hit && hit.collider.tag == "道具") hit.collider.GetComponent<Item>().DropProp();
         //如果 打到的標籤是 敵人 就對他造成傷害
-        if (hit && hit.collider.tag == "敵人") hit.collider.GetComponent<Enemy>().Hit(attack);
+        if (hit && hit.collider.tag == "敵人") hit.collider.GetComponent<Enemy>().Hit(attack + attackWeapon);
 
+        if (hit && hit.collider.tag == "NPC") hit.collider.GetComponent<NPC>().OpenShop();
     }
 
     /// <summary>
@@ -198,7 +200,7 @@ public class Player : MonoBehaviour
 
 
 
-    private int coin;
+    public int coin;
 
 
     //觸發事件 - 進入 : 兩個物件必須有一個勾選 Is Trigger
